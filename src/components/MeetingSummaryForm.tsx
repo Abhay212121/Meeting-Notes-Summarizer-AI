@@ -4,11 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import axios from "axios";
+import { baseUrl } from "@/utils/constant";
+import { GeneratedSummary } from "./GeneratedSummary";
 
 export function MeetingSummaryForm() {
   const [meetingTitle, setMeetingTitle] = useState("");
   const [meetingNotes, setMeetingNotes] = useState("");
   const [customInstructions, setCustomInstructions] = useState("");
+  const [generatedSummary, setGeneratedSummary] = useState("");
+  const [showSummary, setShowSummary] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const quickPrompts = [
     { id: "executive", label: "Executive Summary", icon: "📊" },
@@ -27,9 +33,65 @@ export function MeetingSummaryForm() {
     setCustomInstructions(prompts[promptId as keyof typeof prompts]);
   };
 
-  const handleClick = () => {
-    console.log("clicked", meetingTitle, meetingNotes, customInstructions);
+  const getSummary = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/getsummary`);
+      console.log(response.data);
+      if (response.status === 200) {
+        setGeneratedSummary(response.data.summary);
+        setShowSummary(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const handleClick = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${baseUrl}/api/v1/summarizedata`, {
+        meetingTitle,
+        meetingNotes,
+        customInstructions,
+      });
+      console.log(response.data);
+      if (response.status === 200) {
+        getSummary();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveSummary = (updatedSummary: string) => {
+    setGeneratedSummary(updatedSummary);
+    console.log("Summary saved:", updatedSummary);
+  };
+
+  const handleCancelSummary = () => {
+    setShowSummary(false);
+  };
+
+  if (showSummary) {
+    return (
+      <div className="space-y-4">
+        <GeneratedSummary
+          summary={generatedSummary}
+          onSave={handleSaveSummary}
+          onCancel={handleCancelSummary}
+        />
+        <Button
+          variant="outline"
+          onClick={() => setShowSummary(false)}
+          className="w-full"
+        >
+          Create New Summary
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <Card className="w-full">
@@ -111,6 +173,7 @@ export function MeetingSummaryForm() {
           size="lg"
           onClick={handleClick}
           disabled={!meetingTitle || !meetingNotes}
+          loading={loading}
         >
           Generate Summary
         </Button>

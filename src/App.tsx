@@ -1,5 +1,6 @@
 import { Bot } from "lucide-react";
 import { MeetingSummaryForm } from "./components/MeetingSummaryForm";
+import { MeetingHistory } from "./components/MeetingHistory";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           </div>
         </header>
         <MeetingSummaryForm />
+        <MeetingHistory />
       </div>
     </div>
   );
