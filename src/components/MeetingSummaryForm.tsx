@@ -36,10 +36,10 @@ export function MeetingSummaryForm() {
   const getSummary = async () => {
     try {
       const response = await axios.get(`${baseUrl}/api/v1/getsummary`);
-      console.log(response.data);
+      console.log(response.data.summary);
       if (response.status === 200) {
-        setGeneratedSummary(response.data.summary);
         setShowSummary(true);
+        setGeneratedSummary(response.data.summary);
       }
     } catch (error) {
       console.log(error);
@@ -56,22 +56,36 @@ export function MeetingSummaryForm() {
       });
       console.log(response.data);
       if (response.status === 200) {
-        getSummary();
+        await getSummary();
+        setMeetingNotes("");
+        setCustomInstructions("");
       }
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
+      window.scrollTo({ top: 0 });
     }
   };
 
-  const handleSaveSummary = (updatedSummary: string) => {
-    setGeneratedSummary(updatedSummary);
-    console.log("Summary saved:", updatedSummary);
+  const handleClose = () => {
+    setShowSummary(false);
+    setMeetingNotes("");
+    setMeetingTitle("");
+    setCustomInstructions("");
   };
 
-  const handleCancelSummary = () => {
-    setShowSummary(false);
+  const handleSaveSummary = async (updatedSummary: string) => {
+    try {
+      const response = await axios.post(`${baseUrl}/api/v1/updatesummary`, {
+        updatedSummary,
+      });
+      if (response.status === 200) {
+        await getSummary();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   if (showSummary) {
@@ -80,7 +94,8 @@ export function MeetingSummaryForm() {
         <GeneratedSummary
           summary={generatedSummary}
           onSave={handleSaveSummary}
-          onCancel={handleCancelSummary}
+          onClose={handleClose}
+          meetingTitle={meetingTitle}
         />
         <Button
           variant="outline"
