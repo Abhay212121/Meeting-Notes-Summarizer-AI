@@ -55,6 +55,9 @@ export function GeneratedSummary({
       console.log(response);
       if (response.status === 200) {
         onClose?.();
+        setRecipients("");
+        setAdditionalMessage("");
+        setSubject("");
       }
     } catch (error) {
       console.log(error);
