@@ -48,4 +48,4 @@ The goal is to make meetings more productive by converting long discussions into
 ## 🧑‍💻 Author
 Developed by **Abhay Sharma** 🚀  
 
-📂 Backend Repo: [mangoDesk-backend](https://github.com/Abhay212121/mangoDesk-backend)
+📂 Backend Repo: [actionNotes-backend](https://github.com/Abhay212121/actionNotes-backend)
